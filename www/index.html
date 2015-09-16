@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>EtherProxy</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
+    <script src="handlebars-intl.min.js"></script>
+    <link href="style.css" rel="stylesheet">
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <a href="https://github.com/sammy007/ether-proxy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <script id="stats-template" type="text/x-handlebars-template">
+      <div class="row marketing">
+        <div class="col-lg-6">
+          <dl class="dl-horizontal">
+            <dt>Hashrate</dt>
+            <dd><span class="badge alert-info">{{formatNumber hashrate}}</span></strong></dd>
+            <dt>Total Miners</dt>
+            <dd><span class="badge alert-info">{{totalMiners}}</span></strong></dd>
+            <dt>Miners Online</dt>
+            <dd><span class="badge alert-success">{{totalOnline}}</span></strong></dd>
+          </dl>
+        </div>
+        <div class="col-lg-6">
+          <dl class="dl-horizontal">
+            <dt>Accepted Blocks</dt>
+            <dd><span class="badge alert-success">{{formatNumber validBlocks}}</span></strong></dd>
+            <dt>Rejected Blocks</dt>
+            <dd><span class="badge alert-danger">{{formatNumber invalidBlocks}}</span></strong></dd>
+            <dt>Miners Timed Out</dt>
+            <dd><span class="badge alert-danger">{{timedOut}}</span></strong></dd>
+          </dl>
+        </div>
+        <div class="col-lg-12">
+          <p>
+            <strong>Block height:</strong> <span class="label label-primary">{{height}}</span>
+            <strong>Difficulty:</strong> <span class="label label-primary">{{formatNumber diff}}</span>
+          </p>
+          <p><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
+        </div>
+        <div class="col-lg-12">
+          <h4>Upstream</h4>
+          <table class="table table-condensed">
+            <tr>
+            <th>Name</th>
+            <th>Url</th>
+            </tr>
+            {{#each upstreams}}
+              {{#if sick}}
+              <tr class="danger">
+              {{else}}
+              <tr class="success">
+              {{/if}}
+              {{#if current}}
+              <td><strong>{{name}}</strong></td>
+              {{else}}
+              <td>{{name}}</td>
+              {{/if}}
+            <td>{{url}}</td>
+            </tr>
+            {{/each}}
+          </table>
+        </div>
+        <div class="col-lg-12">
+          <h4>Miners</h4>
+          <table class="table table-condensed">
+            <tr>
+            <th>ID</th>
+            <th>IP</th>
+            <th>HR</th>
+            <th>Last Share</th>
+            <th>Accepted</th>
+            <th>Rejected</th>
+            <th>Blocks Found</th>
+            <th>Blocks Rejected</th>
+            </tr>
+            {{#each miners}}
+              {{#if timeout}}
+              <tr class="danger">
+              {{else}}
+                {{#if warning}}
+                <tr class="warning">
+                {{else}}
+                <tr class="success">
+                {{/if}}
+              {{/if}}
+            <td>{{name}}</td>
+            <td>{{ip}}</td>
+            <td>{{formatNumber hashrate}}</td>
+            <td>{{formatRelative lastBeat}}</td>
+            <td>{{formatNumber validShares}}</td>
+            <td><strong>{{formatNumber invalidShares}}</strong></td>
+            <td>{{formatNumber validBlocks}}</td>
+            <td>{{formatNumber invalidBlocks}}</td>
+            </tr>
+            {{/each}}
+          </table>
+        </div>
+      </div>
+    </script>
+
+    <div class="container">
+      <div class="header clearfix">
+        <h3 class="text-muted">EtherProxy</h3>
+      </div>
+      <div id="alert" class="alert alert-danger hide" role="alert">
+        <strong>An error occured while polling proxy state.</strong>
+        Make sure proxy is running.
+      </div>
+      <a name="stats"></a>
+      <div id="stats"></div>
+    </div>
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted text-center">ETH: 0xb85150eb365e7df0941f0cf08235f987ba91506a</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+{
+	"threads": 2,
+
+	"proxy": {
+		"listen": "0.0.0.0:8546",
+		"clientTimeout": "3m",
+		"blockRefreshInterval": "500ms"
+    },
+
+	"frontend": {
+		"listen": "0.0.0.0:8080"
+    },
+
+	"upstreamCheckInterval": "5s",
+	"upstream": [
+		{
+			"name": "main",
+			"url": "http://127.0.0.1:8545",
+			"timeout": "10s"
+		},
+		{
+			"name": "backup",
+			"url": "http://127.0.0.2:8545",
+			"timeout": "10s"
+		}
+	],
+
+	"newrelicEnabled": false,
+	"newrelicName": "MyEtherProxy",
+	"newrelicKey": "SECRET_KEY",
+	"newrelicVerbose": false
+}
