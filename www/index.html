@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EtherProxy</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
@@ -12,10 +14,10 @@
     <script src="script.js"></script>
   </head>
   <body>
-    <a href="https://github.com/sammy007/ether-proxy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <a class="hidden-sm hidden-xs" href="https://github.com/sammy007/ether-proxy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
     <script id="stats-template" type="text/x-handlebars-template">
       <div class="row marketing">
-        <div class="col-lg-6">
+        <div class="col-xs-6">
           <dl class="dl-horizontal">
             <dt>Hashrate</dt>
             <dd><span class="badge alert-info">{{formatNumber hashrate}}</span></strong></dd>
@@ -25,7 +27,7 @@
             <dd><span class="badge alert-success">{{totalOnline}}</span></strong></dd>
           </dl>
         </div>
-        <div class="col-lg-6">
+        <div class="col-xs-6">
           <dl class="dl-horizontal">
             <dt>Accepted Blocks</dt>
             <dd><span class="badge alert-success">{{formatNumber validBlocks}}</span></strong></dd>
@@ -40,7 +42,7 @@
             <strong>Block height:</strong> <span class="label label-primary">{{height}}</span>
             <strong>Difficulty:</strong> <span class="label label-primary">{{formatNumber diff}}</span>
           </p>
-          <p><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
+          <p class="hidden-sm hidden-xs"><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
         </div>
         <div class="col-lg-12">
           <h4>Upstream</h4>
