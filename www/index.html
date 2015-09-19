@@ -69,38 +69,40 @@
         </div>
         <div class="col-lg-12">
           <h4>Miners</h4>
-          <table class="table table-condensed">
-            <tr>
-            <th>ID</th>
-            <th>IP</th>
-            <th>HR</th>
-            <th>Last Share</th>
-            <th>Accepted</th>
-            <th>Rejected</th>
-            <th>Blocks Found</th>
-            <th>Blocks Rejected</th>
-            </tr>
-            {{#each miners}}
-              {{#if timeout}}
-              <tr class="danger">
-              {{else}}
-                {{#if warning}}
-                <tr class="warning">
+          <div class="table-responsive">
+            <table class="table table-condensed">
+              <tr>
+              <th>ID</th>
+              <th>IP</th>
+              <th>HR</th>
+              <th>Last Share</th>
+              <th>Accepted</th>
+              <th>Rejected</th>
+              <th>Blocks Found</th>
+              <th>Blocks Rejected</th>
+              </tr>
+              {{#each miners}}
+                {{#if timeout}}
+                <tr class="danger">
                 {{else}}
-                <tr class="success">
+                  {{#if warning}}
+                  <tr class="warning">
+                  {{else}}
+                  <tr class="success">
+                  {{/if}}
                 {{/if}}
-              {{/if}}
-            <td>{{name}}</td>
-            <td>{{ip}}</td>
-            <td>{{formatNumber hashrate}}</td>
-            <td>{{formatRelative lastBeat}}</td>
-            <td>{{formatNumber validShares}}</td>
-            <td><strong>{{formatNumber invalidShares}}</strong></td>
-            <td>{{formatNumber validBlocks}}</td>
-            <td>{{formatNumber invalidBlocks}}</td>
-            </tr>
-            {{/each}}
-          </table>
+              <td>{{name}}</td>
+              <td>{{ip}}</td>
+              <td>{{formatNumber hashrate}}</td>
+              <td>{{formatRelative lastBeat}}</td>
+              <td>{{formatNumber validShares}}</td>
+              <td><strong>{{formatNumber invalidShares}}</strong></td>
+              <td>{{formatNumber validBlocks}}</td>
+              <td>{{formatNumber invalidBlocks}}</td>
+              </tr>
+              {{/each}}
+            </table>
+          </div>
         </div>
       </div>
     </script>
