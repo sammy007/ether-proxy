@@ -9,7 +9,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -17,11 +16,9 @@ import (
 )
 
 type ProxyServer struct {
-	sync.RWMutex
 	config        *Config
 	miners        MinersMap
 	blockTemplate atomic.Value
-	instanceId    []byte
 	upstream      int32
 	upstreams     []*rpc.RPCClient
 	validBlocks   uint64
