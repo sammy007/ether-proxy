@@ -15,10 +15,23 @@ function refreshStats(template) {
 	$.getJSON("/stats", function(stats) {
 		$("#alert").addClass('hide');
 
+		// Sort miners by ID
+		if (stats.miners) {
+			stats.miners = stats.miners.sort(compare)
+		}
+
 		// Repaint stats
 		var html = template(stats);
 		$('#stats').html(html);
 	}).fail(function() {
 		$("#alert").removeClass('hide');
 	});
+}
+
+function compare(a, b) {
+	if (a.name < b.name)
+		return -1;
+	if (a.name > b.name)
+		return 1;
+	return 0;
 }
