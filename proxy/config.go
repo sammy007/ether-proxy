@@ -18,6 +18,7 @@ type Proxy struct {
 	Listen               string `json:"listen"`
 	ClientTimeout        string `json:"clientTimeout"`
 	BlockRefreshInterval string `json:"blockRefreshInterval"`
+	HashrateWindow       string `json:"hashrateWindow"`
 }
 
 type Frontend struct {

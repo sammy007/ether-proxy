@@ -4,8 +4,9 @@
 	"proxy": {
 		"listen": "0.0.0.0:8546",
 		"clientTimeout": "3m",
-		"blockRefreshInterval": "500ms"
-    },
+		"blockRefreshInterval": "500ms",
+		"hashrateWindow": "15m"
+	},
 
 	"frontend": {
 		"listen": "0.0.0.0:8080"

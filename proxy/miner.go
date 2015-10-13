@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/ethereum/ethash"
 	"github.com/ethereum/go-ethereum/common"
@@ -17,18 +18,19 @@ var hasher = ethash.New()
 
 type Miner struct {
 	sync.RWMutex
-	Id            string
-	IP            string
-	lastBeat      int64
-	validShares   uint64
-	invalidShares uint64
-	invalidBlocks uint64
-	validBlocks   uint64
-	shares        map[int64]int64
+	Id             string
+	IP             string
+	lastBeat       int64
+	validShares    uint64
+	invalidShares  uint64
+	invalidBlocks  uint64
+	validBlocks    uint64
+	shares         map[int64]int64
+	hashrateWindow time.Duration
 }
 
-func NewMiner(id, ip string) *Miner {
-	miner := &Miner{Id: id, IP: ip, shares: make(map[int64]int64)}
+func NewMiner(id, ip string, hashrateWindow time.Duration) *Miner {
+	miner := &Miner{Id: id, IP: ip, shares: make(map[int64]int64), hashrateWindow: hashrateWindow}
 	return miner
 }
 
@@ -51,16 +53,17 @@ func (m *Miner) storeShare(diff int64) {
 func (m *Miner) hashrate() int64 {
 	now := util.MakeTimestamp()
 	totalShares := int64(0)
+	window := int64(m.hashrateWindow / time.Millisecond)
 	m.Lock()
 	for k, v := range m.shares {
-		if k < now-900000 {
+		if k < now-window {
 			delete(m.shares, k)
 		} else {
 			totalShares += v
 		}
 	}
 	m.Unlock()
-	return totalShares / 900000
+	return totalShares / window
 }
 
 func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, params []string) bool {

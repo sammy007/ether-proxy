@@ -32,7 +32,7 @@ func (s *ProxyServer) handleGetWorkRPC(cs *Session, diff, id string) (reply []st
 func (s *ProxyServer) handleSubmitRPC(cs *Session, diff string, id string, params []string) (reply bool, errorReply *ErrorReply) {
 	miner, ok := s.miners.Get(id)
 	if !ok {
-		miner = NewMiner(id, cs.ip)
+		miner = NewMiner(id, cs.ip, s.hashrateWindow)
 		s.registerMiner(miner)
 	}
 

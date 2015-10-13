@@ -16,15 +16,15 @@ import (
 )
 
 type ProxyServer struct {
-	config        *Config
-	miners        MinersMap
-	blockTemplate atomic.Value
-	upstream      int32
-	upstreams     []*rpc.RPCClient
-	validBlocks   uint64
-	invalidBlocks uint64
-
-	timeout time.Duration
+	config         *Config
+	miners         MinersMap
+	blockTemplate  atomic.Value
+	upstream       int32
+	upstreams      []*rpc.RPCClient
+	validBlocks    uint64
+	invalidBlocks  uint64
+	hashrateWindow time.Duration
+	timeout        time.Duration
 }
 
 type Session struct {
@@ -50,6 +50,9 @@ func NewEndpoint(cfg *Config) *ProxyServer {
 
 	timeout, _ := time.ParseDuration(cfg.Proxy.ClientTimeout)
 	proxy.timeout = timeout
+
+	hashrateWindow, _ := time.ParseDuration(cfg.Proxy.HashrateWindow)
+	proxy.hashrateWindow = hashrateWindow
 
 	proxy.blockTemplate.Store(&BlockTemplate{})
 	proxy.fetchBlockTemplate()
