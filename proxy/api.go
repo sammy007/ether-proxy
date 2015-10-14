@@ -41,6 +41,7 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	t := s.currentBlockTemplate()
 	stats["height"] = t.Height
 	stats["diff"] = t.Difficulty
+	stats["now"] = util.MakeTimestamp()
 
 	json.NewEncoder(w).Encode(stats)
 }
