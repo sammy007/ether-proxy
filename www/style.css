@@ -29,11 +29,12 @@ body {
 }
 
 /* Customize container */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
   .container {
-    max-width: 730px;
+    width: 970px;
   }
 }
+
 .container-narrow > hr {
   margin: 30px 0;
 }
