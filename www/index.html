@@ -21,6 +21,8 @@
           <dl class="dl-horizontal">
             <dt>Hashrate</dt>
             <dd><span class="badge alert-info">{{formatNumber hashrate}}</span></strong></dd>
+            <dt>Hashrate 24h</dt>
+            <dd><span class="badge alert-info">{{formatNumber hashrate24h}}</span></strong></dd>
             <dt>Total Miners</dt>
             <dd><span class="badge alert-info">{{totalMiners}}</span></strong></dd>
             <dt>Miners Online</dt>
@@ -75,6 +77,7 @@
               <th>ID</th>
               <th>IP</th>
               <th>HR</th>
+              <th>HR 24h</th>
               <th>Last Share</th>
               <th>Accepted</th>
               <th>Rejected</th>
@@ -94,6 +97,7 @@
               <td>{{name}}</td>
               <td>{{ip}}</td>
               <td>{{formatNumber hashrate}}</td>
+              <td>{{formatNumber hashrate24h}}</td>
               <td>{{formatRelative lastBeat now=../now}}</td>
               <td>{{formatNumber validShares}}</td>
               <td><strong>{{formatNumber invalidShares}}</strong></td>

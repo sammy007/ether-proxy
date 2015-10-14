@@ -18,20 +18,19 @@ var hasher = ethash.New()
 
 type Miner struct {
 	sync.RWMutex
-	Id             string
-	IP             string
-	startedAt      int64
-	lastBeat       int64
-	validShares    uint64
-	invalidShares  uint64
-	invalidBlocks  uint64
-	validBlocks    uint64
-	shares         map[int64]int64
-	hashrateWindow time.Duration
+	Id            string
+	IP            string
+	startedAt     int64
+	lastBeat      int64
+	validShares   uint64
+	invalidShares uint64
+	invalidBlocks uint64
+	validBlocks   uint64
+	shares        map[int64]int64
 }
 
-func NewMiner(id, ip string, hashrateWindow time.Duration) *Miner {
-	miner := &Miner{Id: id, IP: ip, shares: make(map[int64]int64), hashrateWindow: hashrateWindow, startedAt: util.MakeTimestamp()}
+func NewMiner(id, ip string) *Miner {
+	miner := &Miner{Id: id, IP: ip, shares: make(map[int64]int64), startedAt: util.MakeTimestamp()}
 	return miner
 }
 
@@ -51,10 +50,10 @@ func (m *Miner) storeShare(diff int64) {
 	m.Unlock()
 }
 
-func (m *Miner) hashrate() int64 {
+func (m *Miner) hashrate(hashrateWindow time.Duration) int64 {
 	now := util.MakeTimestamp()
 	totalShares := int64(0)
-	window := int64(m.hashrateWindow / time.Millisecond)
+	window := int64(hashrateWindow / time.Millisecond)
 	boundary := now - m.startedAt
 
 	if boundary > window {
@@ -63,9 +62,9 @@ func (m *Miner) hashrate() int64 {
 
 	m.Lock()
 	for k, v := range m.shares {
-		if k < now-window {
+		if k < now-86400000 {
 			delete(m.shares, k)
-		} else {
+		} else if k >= now-window {
 			totalShares += v
 		}
 	}
