@@ -70,6 +70,13 @@ func NewEndpoint(cfg *Config) *ProxyServer {
 			case <-refreshTimer.C:
 				proxy.fetchBlockTemplate()
 				refreshTimer.Reset(refreshIntv)
+			}
+		}
+	}()
+
+	go func() {
+		for {
+			select {
 			case <-checkTimer.C:
 				proxy.checkUpstreams()
 				checkTimer.Reset(checkIntv)
