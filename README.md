@@ -20,6 +20,7 @@ Dependencies:
 
 Install required packages:
 
+    export GOPATH=$HOME/go
     go get github.com/ethereum/ethash
     go get github.com/ethereum/go-ethereum/common
     go get github.com/gorilla/mux
