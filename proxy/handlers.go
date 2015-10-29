@@ -14,7 +14,7 @@ func (s *ProxyServer) handleGetWorkRPC(cs *Session, diff, id string) (reply []st
 	t := s.currentBlockTemplate()
 	minerDifficulty, err := strconv.ParseFloat(diff, 64)
 	if err != nil {
-		log.Println("Invalid difficulty %v from %v@%v ", diff, id, cs.ip)
+		log.Printf("Invalid difficulty %v from %v@%v ", diff, id, cs.ip)
 		minerDifficulty = 5
 	}
 	if len(t.Header) == 0 {
