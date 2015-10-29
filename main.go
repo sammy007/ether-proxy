@@ -18,7 +18,7 @@ import (
 
 var cfg proxy.Config
 
-func startStratum() {
+func startProxy() {
 	if cfg.Threads > 0 {
 		runtime.GOMAXPROCS(cfg.Threads)
 		log.Printf("Running with %v threads", cfg.Threads)
@@ -77,5 +77,5 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	readConfig(&cfg)
 	startNewrelic()
-	startStratum()
+	startProxy()
 }
