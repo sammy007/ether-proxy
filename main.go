@@ -3,12 +3,10 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"./proxy"
 
@@ -74,7 +72,6 @@ func readConfig(cfg *proxy.Config) {
 }
 
 func main() {
-	rand.Seed(time.Now().UTC().UnixNano())
 	readConfig(&cfg)
 	startNewrelic()
 	startProxy()
