@@ -21,23 +21,23 @@
         <div class="col-xs-6">
           <dl class="dl-horizontal">
             <dt>Hashrate</dt>
-            <dd><span class="badge alert-info">{{formatNumber hashrate}}</span></strong></dd>
+            <dd><span class="badge alert-info">{{formatNumber hashrate}}</span></dd>
             <dt>Hashrate 24h</dt>
-            <dd><span class="badge alert-info">{{formatNumber hashrate24h}}</span></strong></dd>
+            <dd><span class="badge alert-info">{{formatNumber hashrate24h}}</span></dd>
             <dt>Total Miners</dt>
-            <dd><span class="badge alert-info">{{totalMiners}}</span></strong></dd>
+            <dd><span class="badge alert-info">{{totalMiners}}</span></dd>
             <dt>Miners Online</dt>
-            <dd><span class="badge alert-success">{{totalOnline}}</span></strong></dd>
+            <dd><span class="badge alert-success">{{totalOnline}}</span></dd>
           </dl>
         </div>
         <div class="col-xs-6">
           <dl class="dl-horizontal">
             <dt>Accepted Blocks</dt>
-            <dd><span class="badge alert-success">{{formatNumber validBlocks}}</span></strong></dd>
+            <dd><span class="badge alert-success">{{formatNumber validBlocks}}</span></dd>
             <dt>Rejected Blocks</dt>
-            <dd><span class="badge alert-danger">{{formatNumber invalidBlocks}}</span></strong></dd>
+            <dd><span class="badge alert-danger">{{formatNumber invalidBlocks}}</span></dd>
             <dt>Miners Timed Out</dt>
-            <dd><span class="badge alert-danger">{{timedOut}}</span></strong></dd>
+            <dd><span class="badge alert-danger">{{timedOut}}</span></dd>
             {{#if lastBlockFoundAt}}
             <dt>Last Block Found</dt>
             <dd><span class="badge alert-info">{{formatRelative lastBlockFoundAt now}}</span></dd>
