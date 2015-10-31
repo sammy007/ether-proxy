@@ -127,6 +127,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 			s.fetchBlockTemplate()
 			atomic.AddUint64(&m.validBlocks, 1)
 			atomic.AddUint64(&s.validBlocks, 1)
+			atomic.StoreInt64(&s.lastBlockFoundAt, util.MakeTimestamp())
 			log.Printf("Upstream share found by miner %v@%v at height: %d", m.Id, m.IP, t.Height)
 		}
 	}

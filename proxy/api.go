@@ -15,12 +15,13 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 
 	hashrate, hashrate24h, totalOnline, miners := s.collectMinersStats()
 	stats := map[string]interface{}{
-		"miners":      miners,
-		"hashrate":    hashrate,
-		"hashrate24h": hashrate24h,
-		"totalMiners": len(miners),
-		"totalOnline": totalOnline,
-		"timedOut":    len(miners) - totalOnline,
+		"miners":           miners,
+		"hashrate":         hashrate,
+		"hashrate24h":      hashrate24h,
+		"totalMiners":      len(miners),
+		"totalOnline":      totalOnline,
+		"timedOut":         len(miners) - totalOnline,
+		"lastBlockFoundAt": atomic.LoadInt64(&s.lastBlockFoundAt),
 	}
 
 	var upstreams []interface{}

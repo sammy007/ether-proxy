@@ -16,15 +16,16 @@ import (
 )
 
 type ProxyServer struct {
-	config         *Config
-	miners         MinersMap
-	blockTemplate  atomic.Value
-	upstream       int32
-	upstreams      []*rpc.RPCClient
-	validBlocks    uint64
-	invalidBlocks  uint64
-	hashrateWindow time.Duration
-	timeout        time.Duration
+	config           *Config
+	miners           MinersMap
+	blockTemplate    atomic.Value
+	upstream         int32
+	upstreams        []*rpc.RPCClient
+	validBlocks      uint64
+	invalidBlocks    uint64
+	lastBlockFoundAt int64
+	hashrateWindow   time.Duration
+	timeout          time.Duration
 }
 
 type Session struct {

@@ -38,6 +38,10 @@
             <dd><span class="badge alert-danger">{{formatNumber invalidBlocks}}</span></strong></dd>
             <dt>Miners Timed Out</dt>
             <dd><span class="badge alert-danger">{{timedOut}}</span></strong></dd>
+            {{#if lastBlockFoundAt}}
+            <dt>Last Block Found</dt>
+            <dd><span class="badge alert-info">{{formatRelative lastBlockFoundAt now}}</span></dd>
+            {{/if}}
           </dl>
         </div>
         <div class="col-xs-12">
