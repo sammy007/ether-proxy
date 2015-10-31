@@ -10,7 +10,7 @@
 
 	"frontend": {
 		"listen": "0.0.0.0:8080"
-    },
+	},
 
 	"upstreamCheckInterval": "5s",
 	"upstream": [
