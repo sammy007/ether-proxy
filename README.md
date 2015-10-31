@@ -41,6 +41,14 @@ Install required packages (look at Linux install guide above). Then compile:
 
     go build -o ether-proxy.exe main.go
 
+### Building on Mac OS X
+
+If you didn't install [Brew](http://brew.sh/), do it. Then install Golang:
+
+    brew install go
+
+And follow Linux installation instructions because they are the same for OS X.
+
 ### Configuration
 
 Configuration is self-describing, just copy *config.example.json* to *config.json* and specify endpoint URL and upstream URLs.
