@@ -10,6 +10,7 @@ import (
 
 	"./proxy"
 
+	"github.com/goji/httpauth"
 	"github.com/gorilla/mux"
 	"github.com/yvasiyarov/gorelic"
 )
@@ -39,7 +40,12 @@ func startFrontend(cfg *proxy.Config, s *proxy.ProxyServer) {
 	r := mux.NewRouter()
 	r.HandleFunc("/stats", s.StatsIndex)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./www/")))
-	http.ListenAndServe(cfg.Frontend.Listen, r)
+	if len(cfg.Frontend.Password) > 0 {
+		auth := httpauth.SimpleBasicAuth(cfg.Frontend.Login, cfg.Frontend.Password)
+		http.ListenAndServe(cfg.Frontend.Listen, auth(r))
+	} else {
+		http.ListenAndServe(cfg.Frontend.Listen, r)
+	}
 }
 
 func startNewrelic() {

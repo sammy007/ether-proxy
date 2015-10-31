@@ -22,7 +22,9 @@ type Proxy struct {
 }
 
 type Frontend struct {
-	Listen string `json:"listen"`
+	Listen   string `json:"listen"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
 }
 
 type Upstream struct {
