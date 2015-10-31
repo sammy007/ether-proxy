@@ -11,16 +11,19 @@ Ethereum mining proxy with web-interface.
 
 ![Demo](https://raw.githubusercontent.com/sammy007/ether-proxy/master/proxy.png)
 
-### Installation
+### Building on Linux
 
 Dependencies:
 
   * go >= 1.4
   * geth
 
-Install required packages:
+Export GOPATH:
 
     export GOPATH=$HOME/go
+
+Install required packages:
+
     go get github.com/ethereum/ethash
     go get github.com/ethereum/go-ethereum/common
     go get github.com/goji/httpauth
@@ -30,6 +33,13 @@ Install required packages:
 Compile:
 
     go build -o ether-proxy main.go
+
+### Building on Windows
+
+Follow [this wiki paragraph](https://github.com/ethereum/go-ethereum/wiki/Installation-instructions-for-Windows#building-from-source) in order to prepare your environment.
+Install required packages (look at Linux install guide above). Then compile:
+
+    go build -o ether-proxy.exe main.go
 
 ### Configuration
 
