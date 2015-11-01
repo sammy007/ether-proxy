@@ -32,6 +32,7 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 			"name":    u.Name,
 			"url":     u.Url,
 			"sick":    u.Sick(),
+			"height":  u.Height(),
 			"current": current == int32(i),
 		}
 		upstreams = append(upstreams, upstream)
