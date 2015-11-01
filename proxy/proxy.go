@@ -96,7 +96,7 @@ func (s *ProxyServer) rpc() *rpc.RPCClient {
 func (s *ProxyServer) checkUpstreams() {
 	t := s.currentBlockTemplate()
 	candidate := int32(0)
-	height := t.Height
+	bestHeight := int64(t.Height)
 	backup := false
 	prev := s.rpc()
 
@@ -107,12 +107,13 @@ func (s *ProxyServer) checkUpstreams() {
 			continue
 		}
 
+		height := int64(v.Height())
 		// Check if upstream is ahead of previous
-		if v.Height()-5 >= height {
-			height = v.Height()
+		if height-5 >= bestHeight {
+			bestHeight = height
 			prev.MarkSick()
 			// Check if upstream is catching up or stuck
-		} else if v.Height()+5 < height {
+		} else if height+5 < bestHeight {
 			v.MarkSick()
 		} else {
 			v.MarkAlive()
