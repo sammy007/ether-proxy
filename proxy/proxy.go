@@ -94,14 +94,35 @@ func (s *ProxyServer) rpc() *rpc.RPCClient {
 }
 
 func (s *ProxyServer) checkUpstreams() {
+	t := s.currentBlockTemplate()
 	candidate := int32(0)
+	height := t.Height
 	backup := false
+	prev := s.rpc()
 
 	for i, v := range s.upstreams {
-		if v.Check() && !backup {
+		checkOk := v.Check()
+
+		if !checkOk {
+			continue
+		}
+
+		// Check if upstream is ahead of previous
+		if v.Height()-5 >= height {
+			height = v.Height()
+			prev.MarkSick()
+			// Check if upstream is catching up or stuck
+		} else if v.Height()+5 < height {
+			v.MarkSick()
+		} else {
+			v.MarkAlive()
+		}
+
+		if !v.Sick() && !backup {
 			candidate = int32(i)
 			backup = true
 		}
+		prev = v
 	}
 
 	if s.upstream != candidate {

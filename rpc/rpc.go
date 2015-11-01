@@ -145,7 +145,7 @@ func (r *RPCClient) doPost(url string, method string, params interface{}) (JSONR
 	var rpcResp JSONRpcResp
 
 	if err != nil {
-		r.markSick()
+		r.MarkSick()
 		return rpcResp, err
 	}
 
@@ -155,7 +155,7 @@ func (r *RPCClient) doPost(url string, method string, params interface{}) (JSONR
 	err = json.Unmarshal(body, &rpcResp)
 
 	if rpcResp.Error != nil {
-		r.markSick()
+		r.MarkSick()
 	}
 	return rpcResp, err
 }
@@ -163,14 +163,21 @@ func (r *RPCClient) doPost(url string, method string, params interface{}) (JSONR
 func (r *RPCClient) Check() bool {
 	_, err := r.GetWork()
 	if err != nil {
+		r.MarkSick()
 		return false
 	}
 	_, _, err = r.FetchPendingBlock()
 	if err != nil {
+		r.MarkSick()
 		return false
 	}
-	r.markAlive()
-	return !r.Sick()
+	return true
+}
+
+func (r *RPCClient) Height() uint64 {
+	r.RLock()
+	defer r.RUnlock()
+	return r.height
 }
 
 func (r *RPCClient) Sick() bool {
@@ -179,7 +186,7 @@ func (r *RPCClient) Sick() bool {
 	return r.sick
 }
 
-func (r *RPCClient) markSick() {
+func (r *RPCClient) MarkSick() {
 	r.Lock()
 	r.sickRate++
 	r.successRate = 0
@@ -189,7 +196,7 @@ func (r *RPCClient) markSick() {
 	r.Unlock()
 }
 
-func (r *RPCClient) markAlive() {
+func (r *RPCClient) MarkAlive() {
 	r.Lock()
 	r.successRate++
 	if r.successRate >= 5 {
