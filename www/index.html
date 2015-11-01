@@ -47,7 +47,9 @@
         <div class="col-xs-12">
           <p>
             <strong>Block height:</strong> <span class="label label-primary">{{height}}</span>
+            {{#if diff}}
             <strong>Difficulty:</strong> <span class="label label-primary">{{formatNumber diff}}</span>
+            {{/if}}
           </p>
           <p class="hidden-sm hidden-xs"><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
         </div>
