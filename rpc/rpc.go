@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"math/big"
 	"net/http"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -18,6 +21,8 @@ type RPCClient struct {
 	sickRate    int
 	successRate int
 	client      *http.Client
+	height      uint64
+	diff        *big.Int
 }
 
 type GetBlockReply struct {
@@ -76,7 +81,7 @@ func (r *RPCClient) GetWork() ([]string, error) {
 	return reply, err
 }
 
-func (r *RPCClient) GetPendingBlock() (GetBlockReply, error) {
+func (r *RPCClient) getPendingBlock() (GetBlockReply, error) {
 	params := []interface{}{"pending", false}
 
 	rpcResp, err := r.doPost(r.Url, "eth_getBlockByNumber", params)
@@ -90,6 +95,28 @@ func (r *RPCClient) GetPendingBlock() (GetBlockReply, error) {
 
 	err = json.Unmarshal(*rpcResp.Result, &reply)
 	return reply, err
+}
+
+func (r *RPCClient) FetchPendingBlock() (uint64, *big.Int, error) {
+	reply, err := r.getPendingBlock()
+	if err != nil {
+		return 0, nil, err
+	}
+	blockNumber, err := strconv.ParseUint(strings.Replace(reply.Number, "0x", "", -1), 16, 64)
+	if err != nil {
+		return 0, nil, err
+	}
+	blockDiff, err := strconv.ParseInt(strings.Replace(reply.Difficulty, "0x", "", -1), 16, 64)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	r.Lock()
+	defer r.Unlock()
+	r.height = blockNumber
+	r.diff = big.NewInt(blockDiff)
+
+	return r.height, r.diff, nil
 }
 
 func (r *RPCClient) SubmitBlock(params []string) (bool, error) {
@@ -135,6 +162,10 @@ func (r *RPCClient) doPost(url string, method string, params interface{}) (JSONR
 
 func (r *RPCClient) Check() bool {
 	_, err := r.GetWork()
+	if err != nil {
+		return false
+	}
+	_, _, err = r.FetchPendingBlock()
 	if err != nil {
 		return false
 	}

@@ -3,8 +3,6 @@ package proxy
 import (
 	"log"
 	"math/big"
-	"strconv"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -41,7 +39,7 @@ func (s *ProxyServer) fetchBlockTemplate() {
 
 	t := s.currentBlockTemplate()
 
-	height, diff, err := s.fetchPendingBlock()
+	height, diff, err := rpc.FetchPendingBlock()
 	if err != nil {
 		log.Printf("Error while refreshing pending block on %s: %s", rpc.Name, err)
 		return
@@ -59,25 +57,4 @@ func (s *ProxyServer) fetchBlockTemplate() {
 		log.Printf("New block to mine on %s at height: %d", rpc.Name, height)
 	}
 	return
-}
-
-func (s *ProxyServer) fetchPendingBlock() (uint64, *big.Int, error) {
-	rpc := s.rpc()
-	reply, err := rpc.GetPendingBlock()
-	if err != nil {
-		log.Printf("Error while refreshing pending block on %s: %s", rpc.Name, err)
-		return 0, nil, err
-	}
-	blockNumber, err := strconv.ParseUint(strings.Replace(reply.Number, "0x", "", -1), 16, 64)
-	if err != nil {
-		log.Println("Can't parse pending block number")
-		return 0, nil, err
-	}
-	blockDiff, err := strconv.ParseInt(strings.Replace(reply.Difficulty, "0x", "", -1), 16, 64)
-	if err != nil {
-		log.Println("Can't parse pending block difficulty")
-		return 0, nil, err
-	}
-
-	return blockNumber, big.NewInt(blockDiff), nil
 }
