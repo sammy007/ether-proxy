@@ -33,18 +33,25 @@ func startProxy() {
 	go startFrontend(&cfg, s)
 
 	r.Handle("/miner/{diff:.+}/{id:.+}", s)
-	http.ListenAndServe(cfg.Proxy.Listen, r)
+	err := http.ListenAndServe(cfg.Proxy.Listen, r)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func startFrontend(cfg *proxy.Config, s *proxy.ProxyServer) {
 	r := mux.NewRouter()
 	r.HandleFunc("/stats", s.StatsIndex)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./www/")))
+	var err error
 	if len(cfg.Frontend.Password) > 0 {
 		auth := httpauth.SimpleBasicAuth(cfg.Frontend.Login, cfg.Frontend.Password)
-		http.ListenAndServe(cfg.Frontend.Listen, auth(r))
+		err = http.ListenAndServe(cfg.Frontend.Listen, auth(r))
 	} else {
-		http.ListenAndServe(cfg.Frontend.Listen, r)
+		err = http.ListenAndServe(cfg.Frontend.Listen, r)
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
