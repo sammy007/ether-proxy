@@ -6,39 +6,28 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 )
 
 type RPCClient struct {
 	sync.RWMutex
-	Url         string
-	Name        string
-	sick        bool
-	sickRate    int
-	successRate int
-	client      *http.Client
+	Url              *url.URL
+	Name             string
+	Pool             bool
+	sick             bool
+	sickRate         int
+	successRate      int
+	Accepts          uint64
+	Rejects          uint64
+	LastSubmissionAt int64
+	client           *http.Client
 }
 
 type GetBlockReply struct {
-	Number           string   `json:"number"`
-	Hash             string   `json:"hash"`
-	ParentHash       string   `json:"parentHash"`
-	Nonce            string   `json:"nonce"`
-	Sha3Uncles       string   `json:"sha3Uncles"`
-	LogsBloom        string   `json:"logsBloom"`
-	TransactionsRoot string   `json:"transactionsRoot"`
-	StateRoot        string   `json:"stateRoot"`
-	Miner            string   `json:"miner"`
-	Difficulty       string   `json:"difficulty"`
-	TotalDifficulty  string   `json:"totalDifficulty"`
-	Size             string   `json:"size"`
-	ExtraData        string   `json:"extraData"`
-	GasLimit         string   `json:"gasLimit"`
-	GasUsed          string   `json:"gasUsed"`
-	Timestamp        string   `json:"timestamp"`
-	Transactions     []string `json:"transactions"`
-	Uncles           []string `json:"uncles"`
+	Number     string `json:"number"`
+	Difficulty string `json:"difficulty"`
 }
 
 type JSONRpcResp struct {
@@ -47,25 +36,29 @@ type JSONRpcResp struct {
 	Error  map[string]interface{} `json:"error"`
 }
 
-func NewRPCClient(name, url, timeout string) *RPCClient {
-	rpcClient := &RPCClient{Name: name, Url: url}
+func NewRPCClient(name, rawUrl, timeout string, pool bool) (*RPCClient, error) {
+	url, err := url.Parse(rawUrl)
+	if err != nil {
+		return nil, err
+	}
+	rpcClient := &RPCClient{Name: name, Url: url, Pool: pool}
 	timeoutIntv, _ := time.ParseDuration(timeout)
 	rpcClient.client = &http.Client{
 		Timeout: timeoutIntv,
 	}
-	return rpcClient
+	return rpcClient, nil
 }
 
 func (r *RPCClient) GetWork() ([]string, error) {
 	params := []string{}
 
-	rpcResp, err := r.doPost(r.Url, "eth_getWork", params)
+	rpcResp, err := r.doPost(r.Url.String(), "eth_getWork", params)
 	var reply []string
 	if err != nil {
 		return reply, err
 	}
 	if rpcResp.Error != nil {
-		return reply, errors.New(string(rpcResp.Error["message"].(string)))
+		return reply, errors.New(rpcResp.Error["message"].(string))
 	}
 
 	err = json.Unmarshal(*rpcResp.Result, &reply)
@@ -79,24 +72,26 @@ func (r *RPCClient) GetWork() ([]string, error) {
 func (r *RPCClient) GetPendingBlock() (GetBlockReply, error) {
 	params := []interface{}{"pending", false}
 
-	rpcResp, err := r.doPost(r.Url, "eth_getBlockByNumber", params)
+	rpcResp, err := r.doPost(r.Url.String(), "eth_getBlockByNumber", params)
 	var reply GetBlockReply
 	if err != nil {
 		return reply, err
 	}
 	if rpcResp.Error != nil {
-		return reply, errors.New(string(rpcResp.Error["message"].(string)))
+		return reply, errors.New(rpcResp.Error["message"].(string))
 	}
-
 	err = json.Unmarshal(*rpcResp.Result, &reply)
 	return reply, err
 }
 
 func (r *RPCClient) SubmitBlock(params []string) (bool, error) {
-	rpcResp, err := r.doPost(r.Url, "eth_submitWork", params)
+	rpcResp, err := r.doPost(r.Url.String(), "eth_submitWork", params)
 	var result bool
 	if err != nil {
 		return false, err
+	}
+	if rpcResp.Error != nil {
+		return false, errors.New(rpcResp.Error["message"].(string))
 	}
 	err = json.Unmarshal(*rpcResp.Result, &result)
 	if !result {
@@ -105,10 +100,9 @@ func (r *RPCClient) SubmitBlock(params []string) (bool, error) {
 	return result, nil
 }
 
-func (r *RPCClient) doPost(url string, method string, params interface{}) (JSONRpcResp, error) {
+func (r *RPCClient) doPost(url, method string, params interface{}) (JSONRpcResp, error) {
 	jsonReq := map[string]interface{}{"jsonrpc": "2.0", "id": "0", "method": method, "params": params}
 	data, _ := json.Marshal(jsonReq)
-
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	req.Header.Set("Content-Length", (string)(len(data)))
 	req.Header.Set("Content-Type", "application/json")

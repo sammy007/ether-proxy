@@ -16,16 +16,13 @@ import (
 )
 
 type ProxyServer struct {
-	config           *Config
-	miners           MinersMap
-	blockTemplate    atomic.Value
-	upstream         int32
-	upstreams        []*rpc.RPCClient
-	validBlocks      uint64
-	invalidBlocks    uint64
-	lastBlockFoundAt int64
-	hashrateWindow   time.Duration
-	timeout          time.Duration
+	config         *Config
+	miners         MinersMap
+	blockTemplate  atomic.Value
+	upstream       int32
+	upstreams      []*rpc.RPCClient
+	hashrateWindow time.Duration
+	timeout        time.Duration
 }
 
 type Session struct {
@@ -42,8 +39,13 @@ func NewEndpoint(cfg *Config) *ProxyServer {
 
 	proxy.upstreams = make([]*rpc.RPCClient, len(cfg.Upstream))
 	for i, v := range cfg.Upstream {
-		proxy.upstreams[i] = rpc.NewRPCClient(v.Name, v.Url, v.Timeout)
-		log.Printf("Upstream: %s => %s", v.Name, v.Url)
+		client, err := rpc.NewRPCClient(v.Name, v.Url, v.Timeout, v.Pool)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			proxy.upstreams[i] = client
+			log.Printf("Upstream: %s => %s", v.Name, v.Url)
+		}
 	}
 	log.Printf("Default upstream: %s => %s", proxy.rpc().Name, proxy.rpc().Url)
 

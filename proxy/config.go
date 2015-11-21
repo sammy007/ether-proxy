@@ -31,4 +31,5 @@ type Upstream struct {
 	Name    string `json:"name"`
 	Url     string `json:"url"`
 	Timeout string `json:"timeout"`
+	Pool    bool   `json:"pool"`
 }

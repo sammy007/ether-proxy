@@ -2,30 +2,27 @@ package proxy
 
 import (
 	"log"
-	"math/big"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/common"
+	"../util"
 )
-
-var pow256 = common.BigPow(2, 256)
 
 func (s *ProxyServer) handleGetWorkRPC(cs *Session, diff, id string) (reply []string, errorReply *ErrorReply) {
 	t := s.currentBlockTemplate()
-	minerDifficulty, err := strconv.ParseFloat(diff, 64)
-	if err != nil {
-		log.Printf("Invalid difficulty %v from %v@%v ", diff, id, cs.ip)
-		minerDifficulty = 5
-	}
 	if len(t.Header) == 0 {
 		return nil, &ErrorReply{Code: -1, Message: "Work not ready"}
 	}
-	minerAdjustedDifficulty := int64(minerDifficulty * 1000000 * 100)
-	difficulty := big.NewInt(minerAdjustedDifficulty)
-	diff1 := new(big.Int).Div(pow256, difficulty)
-	diffBytes := string(common.ToHex(diff1.Bytes()))
+	targetHex := t.Target
 
-	reply = []string{t.Header, t.Seed, diffBytes}
+	if !s.rpc().Pool {
+		minerDifficulty, err := strconv.ParseFloat(diff, 64)
+		if err != nil {
+			log.Printf("Invalid difficulty %v from %v@%v ", diff, id, cs.ip)
+			minerDifficulty = 5
+		}
+		targetHex = util.MakeTargetHex(minerDifficulty)
+	}
+	reply = []string{t.Header, t.Seed, targetHex}
 	return
 }
 

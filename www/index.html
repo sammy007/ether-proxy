@@ -32,15 +32,15 @@
         </div>
         <div class="col-xs-6">
           <dl class="dl-horizontal">
-            <dt>Accepted Blocks</dt>
-            <dd><span class="badge alert-success">{{formatNumber validBlocks}}</span></dd>
-            <dt>Rejected Blocks</dt>
-            <dd><span class="badge alert-danger">{{formatNumber invalidBlocks}}</span></dd>
+            <dt>Accepted</dt>
+            <dd><span class="badge alert-success">{{formatNumber current.accepts}}</span></dd>
+            <dt>Rejected</dt>
+            <dd><span class="badge alert-danger">{{formatNumber current.rejects}}</span></dd>
             <dt>Miners Timed Out</dt>
-            <dd><span class="badge alert-danger">{{timedOut}}</span></dd>
-            {{#if lastBlockFoundAt}}
-            <dt>Last Block Found</dt>
-            <dd><span class="badge alert-info">{{formatRelative lastBlockFoundAt now}}</span></dd>
+            <dd><span class="badge alert-danger">{{formatNumber timedOut}}</span></dd>
+            {{#if current.lastSubmissionAt}}
+            <dt>Last Submission</dt>
+            <dd><span class="badge alert-info">{{formatRelative current.lastSubmissionAt now}}</span></dd>
             {{/if}}
           </dl>
         </div>
@@ -49,6 +49,12 @@
             <strong>Block height:</strong> <span class="label label-primary">{{height}}</span>
             {{#if diff}}
             <strong>Difficulty:</strong> <span class="label label-primary">{{formatNumber diff}}</span>
+            {{/if}}
+            <strong>Mode:</strong>
+            {{#if current.pool}}
+            <span class="label label-success">POOL</span>
+            {{else}}
+            <span class="label label-primary">SOLO</span>
             {{/if}}
           </p>
           <p class="hidden-sm hidden-xs"><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
@@ -59,6 +65,8 @@
             <tr>
             <th>Name</th>
             <th>Url</th>
+            <th>Accepted</th>
+            <th>Rejected</th>
             </tr>
             {{#each upstreams}}
               {{#if sick}}
@@ -72,6 +80,8 @@
               <td>{{name}}</td>
               {{/if}}
             <td>{{url}}</td>
+            <td>{{formatNumber accepts}}</td>
+            <td><strong>{{formatNumber rejects}}</strong></td>
             </tr>
             {{/each}}
           </table>
@@ -88,8 +98,8 @@
               <th>Last Share</th>
               <th>Accepted</th>
               <th>Rejected</th>
-              <th>Blocks Found</th>
-              <th>Blocks Rejected</th>
+              <th>Upstream Accepted</th>
+              <th>Upstream Rejected</th>
               </tr>
               {{#each miners}}
                 {{#if timeout}}
@@ -108,8 +118,8 @@
               <td>{{formatRelative lastBeat now=../now}}</td>
               <td>{{formatNumber validShares}}</td>
               <td><strong>{{formatNumber invalidShares}}</strong></td>
-              <td>{{formatNumber validBlocks}}</td>
-              <td>{{formatNumber invalidBlocks}}</td>
+              <td>{{formatNumber accepts}}</td>
+              <td>{{formatNumber rejects}}</td>
               </tr>
               {{/each}}
             </table>

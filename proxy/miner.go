@@ -24,8 +24,8 @@ type Miner struct {
 	lastBeat      int64
 	validShares   uint64
 	invalidShares uint64
-	invalidBlocks uint64
-	validBlocks   uint64
+	accepts       uint64
+	rejects       uint64
 	shares        map[int64]int64
 }
 
@@ -83,17 +83,25 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 	}
 	mixDigest := params[2]
 
-	minerDifficulty, err := strconv.ParseFloat(diff, 64)
-	if err != nil {
-		log.Println("Malformed difficulty: " + diff)
-		minerDifficulty = 5
+	rpc := s.rpc()
+	var shareDiff *big.Int
+
+	if !rpc.Pool {
+		minerDifficulty, err := strconv.ParseFloat(diff, 64)
+		if err != nil {
+			log.Println("Malformed difficulty: " + diff)
+			minerDifficulty = 5
+		}
+		diff1 := int64(minerDifficulty * 1000000 * 100)
+		shareDiff = big.NewInt(diff1)
+	} else {
+		shareDiff = util.TargetHexToDiff(t.Target)
 	}
-	minerAdjustedDifficulty := int64(minerDifficulty * 1000000 * 100)
 
 	share := Block{
 		number:      t.Height,
 		hashNoNonce: common.HexToHash(hashNoNonce),
-		difficulty:  big.NewInt(minerAdjustedDifficulty),
+		difficulty:  shareDiff,
 		nonce:       nonce,
 		mixDigest:   common.HexToHash(mixDigest),
 	}
@@ -108,27 +116,27 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 
 	if hasher.Verify(share) {
 		m.heartbeat()
-		m.storeShare(minerAdjustedDifficulty)
+		m.storeShare(shareDiff.Int64())
 		atomic.AddUint64(&m.validShares, 1)
-		log.Printf("Valid share from %s@%s at difficulty %v", m.Id, m.IP, minerDifficulty)
+		log.Printf("Valid share from %s@%s at difficulty %v", m.Id, m.IP, shareDiff)
 	} else {
 		atomic.AddUint64(&m.invalidShares, 1)
 		log.Printf("Invalid share from %s@%s", m.Id, m.IP)
 		return false
 	}
 
-	if hasher.Verify(block) {
-		_, err = s.rpc().SubmitBlock(paramsOrig)
+	if rpc.Pool || hasher.Verify(block) {
+		_, err = rpc.SubmitBlock(paramsOrig)
 		if err != nil {
-			atomic.AddUint64(&m.invalidBlocks, 1)
-			atomic.AddUint64(&s.invalidBlocks, 1)
-			log.Printf("Upstream share submission failure on height: %v for %v: %v", t.Height, t.Header, err)
+			atomic.AddUint64(&m.rejects, 1)
+			atomic.AddUint64(&rpc.Rejects, 1)
+			log.Printf("Upstream submission failure on height %v: %v", t.Height, err)
 		} else {
 			s.fetchBlockTemplate()
-			atomic.AddUint64(&m.validBlocks, 1)
-			atomic.AddUint64(&s.validBlocks, 1)
-			atomic.StoreInt64(&s.lastBlockFoundAt, util.MakeTimestamp())
-			log.Printf("Upstream share found by miner %v@%v at height: %d", m.Id, m.IP, t.Height)
+			atomic.AddUint64(&m.accepts, 1)
+			atomic.AddUint64(&rpc.Accepts, 1)
+			atomic.StoreInt64(&rpc.LastSubmissionAt, util.MakeTimestamp())
+			log.Printf("Upstream share found by miner %v@%v at height %d", m.Id, m.IP, t.Height)
 		}
 	}
 	return true

@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"../rpc"
 	"../util"
 )
 
@@ -15,30 +16,24 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 
 	hashrate, hashrate24h, totalOnline, miners := s.collectMinersStats()
 	stats := map[string]interface{}{
-		"miners":           miners,
-		"hashrate":         hashrate,
-		"hashrate24h":      hashrate24h,
-		"totalMiners":      len(miners),
-		"totalOnline":      totalOnline,
-		"timedOut":         len(miners) - totalOnline,
-		"lastBlockFoundAt": atomic.LoadInt64(&s.lastBlockFoundAt),
+		"miners":      miners,
+		"hashrate":    hashrate,
+		"hashrate24h": hashrate24h,
+		"totalMiners": len(miners),
+		"totalOnline": totalOnline,
+		"timedOut":    len(miners) - totalOnline,
 	}
 
 	var upstreams []interface{}
 	current := atomic.LoadInt32(&s.upstream)
 
 	for i, u := range s.upstreams {
-		upstream := map[string]interface{}{
-			"name":    u.Name,
-			"url":     u.Url,
-			"sick":    u.Sick(),
-			"current": current == int32(i),
-		}
+		upstream := convertUpstream(u)
+		upstream["current"] = current == int32(i)
 		upstreams = append(upstreams, upstream)
 	}
 	stats["upstreams"] = upstreams
-	stats["validBlocks"] = atomic.LoadUint64(&s.validBlocks)
-	stats["invalidBlocks"] = atomic.LoadUint64(&s.invalidBlocks)
+	stats["current"] = convertUpstream(s.rpc())
 	stats["url"] = "http://" + s.config.Proxy.Listen + "/miner/<diff>/<id>"
 
 	t := s.currentBlockTemplate()
@@ -47,6 +42,19 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	stats["now"] = util.MakeTimestamp()
 
 	json.NewEncoder(w).Encode(stats)
+}
+
+func convertUpstream(u *rpc.RPCClient) map[string]interface{} {
+	upstream := map[string]interface{}{
+		"name":             u.Name,
+		"url":              u.Url.String(),
+		"pool":             u.Pool,
+		"sick":             u.Sick(),
+		"accepts":          atomic.LoadUint64(&u.Accepts),
+		"rejects":          atomic.LoadUint64(&u.Rejects),
+		"lastSubmissionAt": atomic.LoadInt64(&u.LastSubmissionAt),
+	}
+	return upstream
 }
 
 func (s *ProxyServer) collectMinersStats() (int64, int64, int, []interface{}) {
@@ -70,8 +78,8 @@ func (s *ProxyServer) collectMinersStats() (int64, int64, int, []interface{}) {
 		stats["lastBeat"] = lastBeat
 		stats["validShares"] = atomic.LoadUint64(&m.Val.validShares)
 		stats["invalidShares"] = atomic.LoadUint64(&m.Val.invalidShares)
-		stats["validBlocks"] = atomic.LoadUint64(&m.Val.validBlocks)
-		stats["invalidBlocks"] = atomic.LoadUint64(&m.Val.invalidBlocks)
+		stats["accepts"] = atomic.LoadUint64(&m.Val.accepts)
+		stats["rejects"] = atomic.LoadUint64(&m.Val.rejects)
 		stats["ip"] = m.Val.IP
 
 		if now-lastBeat > (int64(s.timeout/2) / 1000000) {
