@@ -53,6 +53,26 @@ And follow Linux installation instructions because they are the same for OS X.
 
 Configuration is self-describing, just copy *config.example.json* to *config.json* and specify endpoint URL and upstream URLs.
 
+#### Example upstream section
+
+```javascript
+"upstream": [
+  {
+    "pool": true,
+    "name": "EuroHash.net",
+    "url": "http://eth-eu.eurohash.net:8888/miner/0xb85150eb365e7df0941f0cf08235f987ba91506a/proxy",
+    "timeout": "10s"
+  },
+  {
+    "name": "backup-geth",
+    "url": "http://127.0.0.1:8545",
+    "timeout": "10s"
+  }
+],
+```
+
+In this example we specified [EuroHash.net](https://eurohash.net) mining pool as main mining target and a local geth node as backup for solo.
+
 #### Running
 
     ./ether-proxy config.json
@@ -62,6 +82,12 @@ Configuration is self-describing, just copy *config.example.json* to *config.jso
     ethminer -F http://x.x.x.x:8546/miner/5/gpu-rig -G
     ethminer -F http://x.x.x.x:8546/miner/0.1/cpu-rig -C
 
+### Pools that work with this proxy
+
+* [EuroHash.net](https://eurohash.net) EU Ethereum mining pool
+
+Pool owners, apply for listing here. PM me for implementation details.
+
 ### TODO
 
 **Currently it's solo-only solution.**
@@ -69,7 +95,6 @@ Configuration is self-describing, just copy *config.example.json* to *config.jso
 * Report block numbers
 * Report average luck
 * Report luck per rig
-* Add support for pools
 * Maybe add more stats
 * Maybe add charts
 
