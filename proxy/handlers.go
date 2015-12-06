@@ -38,6 +38,11 @@ func (s *ProxyServer) handleSubmitRPC(cs *Session, diff string, id string, param
 	return
 }
 
+func (s *ProxyServer) handleSubmitHashrate(cs *Session, req *JSONRpcReq) bool {
+	reply, _ := s.rpc().SubmitHashrate(req.Params)
+	return reply
+}
+
 func (s *ProxyServer) handleUnknownRPC(cs *Session, req *JSONRpcReq) *ErrorReply {
 	log.Printf("Unknown RPC method: %v", req)
 	return &ErrorReply{Code: -1, Message: "Invalid method"}

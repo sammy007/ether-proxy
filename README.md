@@ -73,6 +73,8 @@ Configuration is self-describing, just copy *config.example.json* to *config.jso
 
 In this example we specified [EuroHash.net](https://eurohash.net) mining pool as main mining target and a local geth node as backup for solo.
 
+With <code>"submitHashrate": true|false</code> proxy will forward <code>eth_submitHashrate</code> requests to upstream.
+
 #### Running
 
     ./ether-proxy config.json
@@ -103,6 +105,8 @@ Pool owners, apply for listing here. PM me for implementation details.
 * **ETH**: [0xb85150eb365e7df0941f0cf08235f987ba91506a](https://etherchain.org/account/0xb85150eb365e7df0941f0cf08235f987ba91506a)
 
 * **BTC**: [1PYqZATFuYAKS65dbzrGhkrvoN9au7WBj8](https://blockchain.info/address/1PYqZATFuYAKS65dbzrGhkrvoN9au7WBj8)
+
+Thanks to a couple of dudes who donated some Ether to me, I believe, you can do the same.
 
 ### License
 

@@ -180,7 +180,11 @@ func (cs *Session) handleMessage(s *ProxyServer, r *http.Request, req *JSONRpcRe
 		}
 		cs.sendResult(req.Id, &reply)
 	case "eth_submitHashrate":
-		cs.sendResult(req.Id, true)
+		reply := true
+		if s.config.Proxy.SubmitHashrate {
+			reply = s.handleSubmitHashrate(cs, req)
+		}
+		cs.sendResult(req.Id, reply)
 	default:
 		errReply := s.handleUnknownRPC(cs, req)
 		cs.sendError(req.Id, errReply)

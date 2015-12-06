@@ -5,7 +5,8 @@
 		"listen": "0.0.0.0:8546",
 		"clientTimeout": "3m",
 		"blockRefreshInterval": "250ms",
-		"hashrateWindow": "15m"
+		"hashrateWindow": "15m",
+		"submitHashrate": false
 	},
 
 	"frontend": {

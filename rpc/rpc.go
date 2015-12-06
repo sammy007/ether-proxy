@@ -100,6 +100,22 @@ func (r *RPCClient) SubmitBlock(params []string) (bool, error) {
 	return result, nil
 }
 
+func (r *RPCClient) SubmitHashrate(params interface{}) (bool, error) {
+	rpcResp, err := r.doPost(r.Url.String(), "eth_submitHashrate", params)
+	var result bool
+	if err != nil {
+		return false, err
+	}
+	if rpcResp.Error != nil {
+		return false, errors.New(rpcResp.Error["message"].(string))
+	}
+	err = json.Unmarshal(*rpcResp.Result, &result)
+	if !result {
+		return false, errors.New("Request failure")
+	}
+	return result, nil
+}
+
 func (r *RPCClient) doPost(url, method string, params interface{}) (JSONRpcResp, error) {
 	jsonReq := map[string]interface{}{"jsonrpc": "2.0", "id": "0", "method": method, "params": params}
 	data, _ := json.Marshal(jsonReq)
