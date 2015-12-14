@@ -87,6 +87,7 @@ With <code>"submitHashrate": true|false</code> proxy will forward <code>eth_subm
 ### Pools that work with this proxy
 
 * [EuroHash.net](https://eurohash.net) EU Ethereum mining pool
+* [SuprNova.cc](https://eth.suprnova.cc) SuprNova ETH Pool
 
 Pool owners, apply for listing here. PM me for implementation details.
 
