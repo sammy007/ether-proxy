@@ -117,7 +117,7 @@ func (r *RPCClient) SubmitHashrate(params interface{}) (bool, error) {
 }
 
 func (r *RPCClient) doPost(url, method string, params interface{}) (JSONRpcResp, error) {
-	jsonReq := map[string]interface{}{"jsonrpc": "2.0", "id": "0", "method": method, "params": params}
+	jsonReq := map[string]interface{}{"jsonrpc": "2.0", "id": 0, "method": method, "params": params}
 	data, _ := json.Marshal(jsonReq)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	req.Header.Set("Content-Length", (string)(len(data)))
