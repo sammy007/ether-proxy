@@ -20,6 +20,9 @@ function refreshStats(template) {
 			stats.miners = stats.miners.sort(compare)
 		}
 
+		var epochOffset = (30000 - (stats.height % 30000)) * 1000 * 17
+		stats.nextEpoch = stats.now + epochOffset
+
 		// Repaint stats
 		var html = template(stats);
 		$('#stats').html(html);
