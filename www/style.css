@@ -21,6 +21,27 @@ body {
   line-height: 40px;
 }
 
+a.logo {
+  background: #04191f;
+  padding: 3px;
+  text-decoration: none;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+span.logo-1 {
+  font-weight: 700;
+  color: #1994b8;
+}
+span.logo-2 {
+  font-weight: 300;
+  color: #fff;
+}
+span.logo-3 {
+  color: #fff;
+  font-weight: 100;
+}
+
 /* Custom page footer */
 .footer {
   padding-top: 15px;
