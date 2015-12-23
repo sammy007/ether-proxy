@@ -20,6 +20,8 @@ type Proxy struct {
 	BlockRefreshInterval string `json:"blockRefreshInterval"`
 	HashrateWindow       string `json:"hashrateWindow"`
 	SubmitHashrate       bool   `json:"submitHashrate"`
+	LuckWindow           string `json:"luckWindow"`
+	LargeLuckWindow      string `json:"largeLuckWindow"`
 }
 
 type Frontend struct {

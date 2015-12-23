@@ -61,12 +61,12 @@
         </div>
         <div class="col-xs-12">
           <p>
-            <strong>Blocks 24h:</strong> <span class="label label-primary">{{formatNumber blocksCount24h}}</span>
-            <strong>Shares/Diff 24h:</strong>
-            <span class="label label-primary">{{formatNumber variance24h style="percent" minimumFractionDigits=2 maximumFractionDigits=2}}</span>
-            <strong>Blocks 1w:</strong> <span class="label label-primary">{{formatNumber blocksCount1w}}</span>
-            <strong>Shares/Diff 1w:</strong>
-            <span class="label label-primary">{{formatNumber variance1w style="percent" minimumFractionDigits=2 maximumFractionDigits=2}}</span>
+            <strong>Blocks {{luck.window}}:</strong> <span class="label label-primary">{{formatNumber luck.blocksCount}}</span>
+            <strong>Shares/Diff {{luck.window}}:</strong>
+            <span class="label label-primary">{{formatNumber luck.variance style="percent" minimumFractionDigits=2 maximumFractionDigits=2}}</span>
+            <strong>Blocks {{luck.largeWindow}}:</strong> <span class="label label-primary">{{formatNumber luck.totalBlocksCount}}</span>
+            <strong>Shares/Diff {{luck.largeWindow}}:</strong>
+            <span class="label label-primary">{{formatNumber luck.totalVariance style="percent" minimumFractionDigits=2 maximumFractionDigits=2}}</span>
           </p>
           <p class="hidden-sm hidden-xs"><strong>Run:</strong> <code>ethminer -F {{url}}</code></p>
         </div>

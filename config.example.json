@@ -6,7 +6,9 @@
 		"clientTimeout": "3m",
 		"blockRefreshInterval": "100ms",
 		"hashrateWindow": "15m",
-		"submitHashrate": false
+		"submitHashrate": false,
+		"luckWindow": "24h",
+		"largeLuckWindow": "72h"
 	},
 
 	"frontend": {
