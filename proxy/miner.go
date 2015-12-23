@@ -118,6 +118,10 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 		m.heartbeat()
 		m.storeShare(shareDiff.Int64())
 		atomic.AddUint64(&m.validShares, 1)
+		// Log round share for solo mode only
+		if !rpc.Pool {
+			atomic.AddInt64(&s.roundShares, shareDiff.Int64())
+		}
 		log.Printf("Valid share from %s@%s at difficulty %v", m.Id, m.IP, shareDiff)
 	} else {
 		atomic.AddUint64(&m.invalidShares, 1)
@@ -132,9 +136,16 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 			atomic.AddUint64(&rpc.Rejects, 1)
 			log.Printf("Upstream submission failure on height %v: %v", t.Height, err)
 		} else {
-			// Solo block found, must refresh job
 			if !rpc.Pool {
+				// Solo block found, must refresh job
 				s.fetchBlockTemplate()
+
+				// Log this round variance
+				roundShares := atomic.SwapInt64(&s.roundShares, 0)
+				variance := float64(roundShares) / float64(t.Difficulty.Int64())
+				s.blocksMu.Lock()
+				s.blockStats[util.MakeTimestamp()] = variance
+				s.blocksMu.Unlock()
 			}
 			atomic.AddUint64(&m.accepts, 1)
 			atomic.AddUint64(&rpc.Accepts, 1)

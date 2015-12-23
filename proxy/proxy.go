@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -23,6 +24,9 @@ type ProxyServer struct {
 	upstreams      []*rpc.RPCClient
 	hashrateWindow time.Duration
 	timeout        time.Duration
+	roundShares    int64
+	blocksMu       sync.RWMutex
+	blockStats     map[int64]float64
 }
 
 type Session struct {
@@ -35,7 +39,7 @@ const (
 )
 
 func NewEndpoint(cfg *Config) *ProxyServer {
-	proxy := &ProxyServer{config: cfg}
+	proxy := &ProxyServer{config: cfg, blockStats: make(map[int64]float64)}
 
 	proxy.upstreams = make([]*rpc.RPCClient, len(cfg.Upstream))
 	for i, v := range cfg.Upstream {

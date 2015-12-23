@@ -41,6 +41,12 @@ func (s *ProxyServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 	stats["diff"] = t.Difficulty
 	stats["now"] = util.MakeTimestamp()
 
+	blocksCount, variance, totalBlocksCount, totalVariance := s.getBlockStats()
+	stats["blocksCount24h"] = blocksCount
+	stats["variance24h"] = variance
+	stats["blocksCount1w"] = totalBlocksCount
+	stats["variance1w"] = totalVariance
+
 	json.NewEncoder(w).Encode(stats)
 }
 
@@ -93,4 +99,37 @@ func (s *ProxyServer) collectMinersStats() (int64, int64, int, []interface{}) {
 		result = append(result, stats)
 	}
 	return totalHashrate, totalHashrate24h, totalOnline, result
+}
+
+func (s *ProxyServer) getBlockStats() (int, float64, int, float64) {
+	now := util.MakeTimestamp()
+	smallWindow := int64(time.Hour * 24 / time.Millisecond)
+	largeWindow := smallWindow * 7
+	var variance float64
+	var totalVariance float64
+	var blocksCount int
+	var totalBlocksCount int
+
+	s.blocksMu.Lock()
+	defer s.blocksMu.Unlock()
+
+	for k, v := range s.blockStats {
+		if k >= now-smallWindow {
+			blocksCount++
+			variance += v
+		}
+		if k >= now-largeWindow {
+			totalBlocksCount++
+			totalVariance += v
+		} else {
+			delete(s.blockStats, k)
+		}
+	}
+	if blocksCount != 0 {
+		variance = variance / float64(blocksCount)
+	}
+	if totalBlocksCount != 0 {
+		totalVariance = totalVariance / float64(totalBlocksCount)
+	}
+	return blocksCount, variance, totalBlocksCount, totalVariance
 }
