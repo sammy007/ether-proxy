@@ -132,7 +132,10 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 			atomic.AddUint64(&rpc.Rejects, 1)
 			log.Printf("Upstream submission failure on height %v: %v", t.Height, err)
 		} else {
-			s.fetchBlockTemplate()
+			// Solo block found, must refresh job
+			if !rpc.Pool {
+				s.fetchBlockTemplate()
+			}
 			atomic.AddUint64(&m.accepts, 1)
 			atomic.AddUint64(&rpc.Accepts, 1)
 			atomic.StoreInt64(&rpc.LastSubmissionAt, util.MakeTimestamp())
