@@ -131,6 +131,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 
 	if rpc.Pool || hasher.Verify(block) {
 		_, err = rpc.SubmitBlock(paramsOrig)
+		now := util.MakeTimestamp()
 		if err != nil {
 			atomic.AddUint64(&m.rejects, 1)
 			atomic.AddUint64(&rpc.Rejects, 1)
@@ -144,12 +145,12 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 				roundShares := atomic.SwapInt64(&s.roundShares, 0)
 				variance := float64(roundShares) / float64(t.Difficulty.Int64())
 				s.blocksMu.Lock()
-				s.blockStats[util.MakeTimestamp()] = variance
+				s.blockStats[now] = variance
 				s.blocksMu.Unlock()
 			}
 			atomic.AddUint64(&m.accepts, 1)
 			atomic.AddUint64(&rpc.Accepts, 1)
-			atomic.StoreInt64(&rpc.LastSubmissionAt, util.MakeTimestamp())
+			atomic.StoreInt64(&rpc.LastSubmissionAt, now)
 			log.Printf("Upstream share found by miner %v@%v at height %d", m.Id, m.IP, t.Height)
 		}
 	}
