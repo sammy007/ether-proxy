@@ -40,7 +40,7 @@
             <dd><span class="badge alert-danger">{{formatNumber timedOut}}</span></dd>
             {{#if current.lastSubmissionAt}}
             <dt>Last Submission</dt>
-            <dd><span class="badge alert-info">{{formatRelative current.lastSubmissionAt now}}</span></dd>
+            <dd><span class="badge alert-info">{{formatRelative current.lastSubmissionAt now=now}}</span></dd>
             {{/if}}
           </dl>
         </div>
@@ -50,7 +50,7 @@
             {{#if diff}}
             <strong>Difficulty:</strong> <span class="label label-primary">{{formatNumber diff}}</span>
             {{/if}}
-            <strong>Next Epoch:</strong> <span class="label label-primary">{{formatRelative nextEpoch now units="hour"}}</span>
+            <strong>Next Epoch:</strong> <span class="label label-primary">{{formatRelative nextEpoch now=now units="hour"}}</span>
             <strong>Mode:</strong>
             {{#if current.pool}}
             <span class="label label-success">POOL</span>
