@@ -96,7 +96,6 @@ Pool owners, apply for listing here. PM me for implementation details.
 **Currently it's solo-only solution.**
 
 * Report block numbers
-* Report average luck
 * Report luck per rig
 * Maybe add more stats
 * Maybe add charts
