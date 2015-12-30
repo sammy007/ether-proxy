@@ -143,13 +143,13 @@ func (r *RPCClient) doPost(url, method string, params interface{}) (JSONRpcResp,
 	return rpcResp, err
 }
 
-func (r *RPCClient) Check() bool {
+func (r *RPCClient) Check() (bool, error) {
 	_, err := r.GetWork()
 	if err != nil {
-		return false
+		return false, err
 	}
 	r.markAlive()
-	return !r.Sick()
+	return !r.Sick(), nil
 }
 
 func (r *RPCClient) Sick() bool {

@@ -111,7 +111,11 @@ func (s *ProxyServer) checkUpstreams() {
 	backup := false
 
 	for i, v := range s.upstreams {
-		if v.Check() && !backup {
+		ok, err := v.Check()
+		if err != nil {
+			log.Printf("Upstream %v didn't pass check: %v", v.Name, err)
+		}
+		if ok && !backup {
 			candidate = int32(i)
 			backup = true
 		}
