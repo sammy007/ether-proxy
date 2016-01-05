@@ -53,6 +53,7 @@ func convertUpstream(u *rpc.RPCClient) map[string]interface{} {
 		"accepts":          atomic.LoadUint64(&u.Accepts),
 		"rejects":          atomic.LoadUint64(&u.Rejects),
 		"lastSubmissionAt": atomic.LoadInt64(&u.LastSubmissionAt),
+		"failsCount":       atomic.LoadUint64(&u.FailsCount),
 	}
 	return upstream
 }

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -23,6 +24,7 @@ type RPCClient struct {
 	Rejects          uint64
 	LastSubmissionAt int64
 	client           *http.Client
+	FailsCount       uint64
 }
 
 type GetBlockReply struct {
@@ -160,6 +162,9 @@ func (r *RPCClient) Sick() bool {
 
 func (r *RPCClient) markSick() {
 	r.Lock()
+	if !r.sick {
+		atomic.AddUint64(&r.FailsCount, 1)
+	}
 	r.sickRate++
 	r.successRate = 0
 	if r.sickRate >= 5 {

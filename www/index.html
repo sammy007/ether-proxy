@@ -78,6 +78,7 @@
             <th>Url</th>
             <th>Accepted</th>
             <th>Rejected</th>
+            <th>Fails</th>
             </tr>
             {{#each upstreams}}
               {{#if sick}}
@@ -93,6 +94,7 @@
             <td>{{url}}</td>
             <td>{{formatNumber accepts}}</td>
             <td><strong>{{formatNumber rejects}}</strong></td>
+            <td>{{failsCount}}</td>
             </tr>
             {{/each}}
           </table>
