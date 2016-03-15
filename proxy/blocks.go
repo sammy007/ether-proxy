@@ -65,7 +65,6 @@ func (s *ProxyServer) fetchPendingBlock() (uint64, *big.Int, error) {
 	rpc := s.rpc()
 	reply, err := rpc.GetPendingBlock()
 	if err != nil {
-		log.Printf("Error while refreshing pending block on %s: %s", rpc.Name, err)
 		return 0, nil, err
 	}
 	blockNumber, err := strconv.ParseUint(strings.Replace(reply.Number, "0x", "", -1), 16, 64)
