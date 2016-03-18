@@ -20,7 +20,7 @@ function refreshStats(template) {
 			stats.miners = stats.miners.sort(compare)
 		}
 
-		var epochOffset = (30000 - (stats.height % 30000)) * 1000 * 15
+		var epochOffset = (30000 - (stats.height % 30000)) * 1000 * 14.4
 		stats.nextEpoch = stats.now + epochOffset
 
 		// Repaint stats
