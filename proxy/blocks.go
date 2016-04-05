@@ -55,8 +55,8 @@ func (s *ProxyServer) fetchBlockTemplate() {
 	}
 	s.blockTemplate.Store(&newTemplate)
 
-	if height != t.Height {
-		log.Printf("New block to mine on %s at height: %d", rpc.Name, height)
+	if newTemplate.Header != t.Header {
+		log.Printf("New block to mine on %s at height: %d / %s", rpc.Name, height, reply[0][0:10])
 	}
 	return
 }
