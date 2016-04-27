@@ -81,6 +81,11 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 		log.Printf("Malformed nonce: %v", err)
 		return false
 	}
+	h, ok := t.headers[hashNoNonce]
+	if !ok {
+		log.Printf("Stale share from %v@%v", m.Id, m.IP)
+		return false
+	}
 	mixDigest := params[2]
 
 	rpc := s.rpc()
@@ -95,11 +100,11 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 		diff1 := int64(minerDifficulty * 1000000 * 100)
 		shareDiff = big.NewInt(diff1)
 	} else {
-		shareDiff = util.TargetHexToDiff(t.Target)
+		shareDiff = h.diff
 	}
 
 	share := Block{
-		number:      t.Height,
+		number:      h.height,
 		hashNoNonce: common.HexToHash(hashNoNonce),
 		difficulty:  shareDiff,
 		nonce:       nonce,
@@ -107,9 +112,9 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 	}
 
 	block := Block{
-		number:      t.Height,
+		number:      h.height,
 		hashNoNonce: common.HexToHash(hashNoNonce),
-		difficulty:  t.Difficulty,
+		difficulty:  h.diff,
 		nonce:       nonce,
 		mixDigest:   common.HexToHash(mixDigest),
 	}
@@ -122,7 +127,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 		if !rpc.Pool {
 			atomic.AddInt64(&s.roundShares, shareDiff.Int64())
 		}
-		log.Printf("Valid share from %s@%s at difficulty %v", m.Id, m.IP, shareDiff)
+		log.Printf("Valid share at height %v/%v from %s@%s at difficulty %v", h.height, t.Height, m.Id, m.IP, shareDiff)
 	} else {
 		atomic.AddUint64(&m.invalidShares, 1)
 		log.Printf("Invalid share from %s@%s", m.Id, m.IP)
@@ -135,7 +140,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 		if err != nil {
 			atomic.AddUint64(&m.rejects, 1)
 			atomic.AddUint64(&rpc.Rejects, 1)
-			log.Printf("Upstream submission failure on height %v: %v", t.Height, err)
+			log.Printf("Upstream submission failure on height %v: %v", h.height, err)
 		} else {
 			if !rpc.Pool {
 				// Solo block found, must refresh job
@@ -143,7 +148,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 
 				// Log this round variance
 				roundShares := atomic.SwapInt64(&s.roundShares, 0)
-				variance := float64(roundShares) / float64(t.Difficulty.Int64())
+				variance := float64(roundShares) / float64(h.diff.Int64())
 				s.blocksMu.Lock()
 				s.blockStats[now] = variance
 				s.blocksMu.Unlock()
@@ -151,7 +156,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 			atomic.AddUint64(&m.accepts, 1)
 			atomic.AddUint64(&rpc.Accepts, 1)
 			atomic.StoreInt64(&rpc.LastSubmissionAt, now)
-			log.Printf("Upstream share found by miner %v@%v at height %d", m.Id, m.IP, t.Height)
+			log.Printf("Upstream share found by miner %v@%v at height %d", m.Id, m.IP, h.height)
 		}
 	}
 	return true
