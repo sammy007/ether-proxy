@@ -84,7 +84,7 @@ func (m *Miner) processShare(s *ProxyServer, t *BlockTemplate, diff string, para
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", m.Id, m.IP)
-		atomic.AddUint64(&m.rejects, 1)
+		atomic.AddUint64(&m.invalidShares, 1)
 		return false
 	}
 	mixDigest := params[2]
