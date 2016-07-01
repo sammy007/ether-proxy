@@ -47,14 +47,17 @@ func (s *ProxyServer) fetchBlockTemplate() {
 		log.Printf("Error while refreshing block template on %s: %s", rpc.Name, err)
 		return
 	}
-
 	t := s.currentBlockTemplate()
-
+	// No need to update, we have fresh job
+	if t != nil && t.Header == reply[0] {
+		return
+	}
 	height, diff, err := s.fetchPendingBlock()
 	if err != nil {
 		log.Printf("Error while refreshing pending block on %s: %s", rpc.Name, err)
 		return
 	}
+
 	newTemplate := BlockTemplate{
 		Header:     reply[0],
 		Seed:       reply[1],
@@ -67,17 +70,13 @@ func (s *ProxyServer) fetchBlockTemplate() {
 	newTemplate.headers[reply[0]] = heightDiffPair{diff: util.TargetHexToDiff(reply[2]), height: height}
 	if t != nil {
 		for k, v := range t.headers {
-			if v.height >= height-maxBacklog {
+			if v.height > height-maxBacklog {
 				newTemplate.headers[k] = v
 			}
 		}
 	}
 	s.blockTemplate.Store(&newTemplate)
-
-	if newTemplate.Header != t.Header {
-		log.Printf("New block to mine on %s at height: %d / %s", rpc.Name, height, reply[0][0:10])
-	}
-	return
+	log.Printf("New block to mine on %s at height %d / %s", rpc.Name, height, reply[0][0:10])
 }
 
 func (s *ProxyServer) fetchPendingBlock() (uint64, *big.Int, error) {
