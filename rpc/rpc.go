@@ -62,12 +62,7 @@ func (r *RPCClient) GetWork() ([]string, error) {
 	if rpcResp.Error != nil {
 		return reply, errors.New(rpcResp.Error["message"].(string))
 	}
-
 	err = json.Unmarshal(*rpcResp.Result, &reply)
-	// Handle empty result, daemon is catching up (geth bug!!!)
-	if len(reply) != 3 || len(reply[0]) == 0 {
-		return reply, errors.New("Daemon is not ready")
-	}
 	return reply, err
 }
 
